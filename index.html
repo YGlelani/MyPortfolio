@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Phikelelani  Gumbi · Portfolio</title>
+  <!-- Tailwind via CDN + base styles -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    /* custom variables & glassmorphism */
+    :root {
+      --navy: #0a192f;
+      --orange: #f97316;
+      --gold: #fbbf24;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #0b1a2f;
+      color: #e6edf3;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    /* loading screen */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #0b1a2f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader-spinner {
+      width: 3.5rem;
+      height: 3.5rem;
+      border: 5px solid #1e3a5f;
+      border-top-color: #f97316;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* glassmorphism */
+    .glass {
+      background: rgba(10, 25, 47, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 12px 30px -10px rgba(0,0,0,0.6);
+    }
+    .glass-card {
+      background: rgba(15, 35, 60, 0.5);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(249, 115, 22, 0.15);
+      transition: all 0.25s ease;
+    }
+    .glass-card:hover {
+      border-color: #f97316;
+      transform: translateY(-4px);
+      box-shadow: 0 16px 30px -8px rgba(249, 115, 22, 0.2);
+    }
+
+    /* typing cursor */
+    .typing-cursor {
+      display: inline-block;
+      width: 3px;
+      background: #f97316;
+      margin-left: 4px;
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* nav */
+    .nav-link {
+      position: relative;
+      color: #b0c4de;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: #f97316; }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0;
+      height: 2px;
+      background: #f97316;
+      transition: width 0.25s;
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* back-to-top */
+    #backTop {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 50;
+      background: #f97316;
+      color: #0b1a2f;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+      transition: all 0.2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #backTop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #backTop:hover { transform: scale(1.05); background: #fb923c; }
+
+    /* reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* mobile menu */
+    .mobile-menu {
+      transition: max-height 0.3s ease, opacity 0.25s ease;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+    .mobile-menu.open {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    /* skill card icon */
+    .skill-icon {
+      color: #f97316;
+      font-size: 1.8rem;
+    }
+
+    /* project image placeholder */
+    .project-img-placeholder {
+      background: linear-gradient(145deg, #1e3a5f, #0b1a2f);
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f97316;
+      font-size: 2.5rem;
+      border-radius: 1rem 1rem 0 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader" aria-hidden="true">
+  <div class="loader-spinner"></div>
+</div>
+
+<!-- BACK TO TOP -->
+<button id="backTop" aria-label="Back to top">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- STICKY NAV -->
+<header class="fixed top-0 left-0 w-full z-50 glass border-b border-white/5">
+  <div class="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
+    <a href="#" class="text-xl font-bold tracking-tight text-white/90">
+      <span class="text-orange-400">P</span>hikelelani
+    </a>
+
+    <!-- desktop nav -->
+    <nav class="hidden md:flex items-center gap-7 text-sm font-medium">
+      <a href="#about" class="nav-link">About</a>
+      <a href="#education" class="nav-link">Education</a>
+      <a href="#experience" class="nav-link">Experience</a>
+      <a href="#skills" class="nav-link">Skills</a>
+      <a href="#projects" class="nav-link">Projects</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </nav>
+
+    <!-- hamburger -->
+    <button id="hamburger" class="md:hidden text-2xl text-white/80 focus:outline-none" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- mobile menu -->
+  <div id="mobileMenu" class="mobile-menu md:hidden bg-[#0a192f]/90 backdrop-blur-lg px-5 pb-4 border-b border-white/5">
+    <a href="#about" class="block py-2 nav-link">About</a>
+    <a href="#education" class="block py-2 nav-link">Education</a>
+    <a href="#experience" class="block py-2 nav-link">Experience</a>
+    <a href="#skills" class="block py-2 nav-link">Skills</a>
+    <a href="#projects" class="block py-2 nav-link">Projects</a>
+    <a href="#contact" class="block py-2 nav-link">Contact</a>
+  </div>
+</header>
+
+<main class="pt-20 max-w-6xl mx-auto px-5">
+
+  <!-- HERO -->
+  <section id="hero" class="min-h-[90vh] flex items-center relative overflow-hidden">
+    <!-- animated background (subtle) -->
+    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-[#0b1a2f] via-[#0f2847] to-[#0b1a2f] opacity-80"></div>
+    <div class="absolute inset-0 -z-10 opacity-10" style="background: radial-gradient(circle at 30% 40%, #f97316, transparent 60%), radial-gradient(circle at 70% 80%, #fbbf24, transparent 50%);"></div>
+
+    <div class="grid md:grid-cols-5 gap-8 items-center w-full py-10">
+      <div class="md:col-span-3 space-y-5">
+        <div class="text-sm uppercase tracking-widest text-orange-300/80 flex items-center gap-2">
+          <span class="w-8 h-px bg-orange-400/60"></span> Hello, I'm
+        </div>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+          <span class="text-white">Phikelelani </span><br />
+          <span class="text-orange-400">Gumbi</span>
+        </h1>
+        <div class="text-xl sm:text-2xl text-gray-300 flex items-center gap-2">
+          <span id="typedText" class="font-light">Computer Science Student</span>
+          <span class="typing-cursor"></span>
+        </div>
+        <p class="text-gray-400 max-w-lg text-sm sm:text-base">
+          Bergville, KwaZulu-Natal, South Africa
+        </p>
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="/Lelani_CV.pdf" download class="px-6 py-3 bg-orange-500 hover:bg-orange-400 text-[#0b1a2f] font-semibold rounded-full transition shadow-lg shadow-orange-500/30 text-sm flex items-center gap-2">
+  <i class="fas fa-file-pdf"></i> Download CV
+</a>
+          <a href="#contact" class="px-6 py-3 border border-orange-400/60 text-orange-300 hover:bg-orange-500/10 rounded-full transition text-sm flex items-center gap-2">
+            <i class="fas fa-paper-plane"></i> Contact Me
+          </a>
+        </div>
+      </div>
+      <div class="md:col-span-2 flex justify-center">
+        <div class="w-44 h-44 sm:w-56 sm:h-56 rounded-full border-4 border-orange-400/40 shadow-2xl shadow-orange-500/20 overflow-hidden bg-[#1a365d] flex items-center justify-center">
+          <i class="fas fa-user-circle text-7xl text-orange-300/50"><img src="/lelani.jpg" alt=""></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="py-16 reveal">
+    <h2 class="text-3xl font-bold inline-block border-b-4 border-orange-400 pb-1 mb-8">About Me</h2>
+    <div class="glass-card rounded-2xl p-6 sm:p-8 max-w-4xl">
+      <p class="text-gray-300 leading-relaxed text-base sm:text-lg">
+        Motivated and detail-oriented Computer Science student currently completing a 
+        <span class="text-orange-300 font-medium">Diploma in Computer Science</span> at 
+        <span class="text-orange-300 font-medium">Tshwane University of Technology</span>. 
+        Passionate about building practical solutions, with hands-on experience in web development, 
+        databases, and IT systems through academic projects and community work. Interested in 
+        software development, database systems, internet programming, and mobile computing.
+      </p>
+    </div>
+  </section>
+
+  <!-- EDUCATION timeline -->
+  <section id="education" class="py-16 reveal">
+    <h2 class="text-3xl font-bold inline-block border-b-4 border-orange-400 pb-1 mb-8">Education</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- card 1 -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-graduation-cap text-orange-400 text-2xl mt-1"></i>
+          <div>
+            <h3 class="text-xl font-semibold text-white">Diploma in Computer Science</h3>
+            <p class="text-orange-300/80 text-sm">Tshwane University of Technology · Current</p>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-1.5 text-xs">
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Object-Oriented Programming</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Software Engineering</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Operating Systems</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Database Programming</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Information Security</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Mobile Computing</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Internet Programming</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Software Project Management</span>
+        </div>
+      </div>
+      <!-- card 2 -->
+      <div class="glass-card rounded-2xl p-6">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-school text-orange-400 text-2xl mt-1"></i>
+          <div>
+            <h3 class="text-xl font-semibold text-white">National Senior Certificate</h3>
+            <p class="text-orange-300/80 text-sm">Amangwane High School · 2022</p>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-1.5 text-xs">
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Mathematics</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Accounting</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Business Studies</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">English First Additional Language</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Computer Applications Technology</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">Economics</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-gray-300">IsiZulu Home Language</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK EXPERIENCE -->
+  <section id="experience" class="py-16 reveal">
+    <h2 class="text-3xl font-bold inline-block border-b-4 border-orange-400 pb-1 mb-8">Work Experience</h2>
+    <div class="glass-card rounded-2xl p-6 sm:p-8 max-w-3xl">
+      <div class="flex items-start gap-4">
+        <i class="fas fa-briefcase text-orange-400 text-2xl mt-1"></i>
+        <div>
+          <h3 class="text-xl font-semibold text-white">Web Administrator (Volunteer)</h3>
+          <p class="text-orange-300/80 text-sm">IkusasaLentsha NPO · 2024 – Present</p>
+          <ul class="mt-3 space-y-2 text-gray-300 text-sm list-disc list-inside marker:text-orange-400">
+            <li>Developed and managed the organisation's official website.</li>
+            <li>Designed and maintained responsive web pages using HTML, CSS, and JavaScript.</li>
+            <li>Updated website content related to student support programmes and events.</li>
+            <li>Improved the organisation's digital presence by supporting online engagement and accessibility.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNICAL SKILLS -->
+  <section id="skills" class="py-16 reveal">
+    <h2 class="text-3xl font-bold inline-block border-b-4 border-orange-400 pb-1 mb-8">Technical Skills</h2>
+    <div class="grid sm:grid-cols-2 gap-6">
+      <div class="glass-card rounded-2xl p-6">
+        <h4 class="text-orange-300 font-semibold flex items-center gap-2"><i class="fas fa-code skill-icon"></i> Programming & Development</h4>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">HTML</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">CSS</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">JavaScript</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">Java</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">MySQL</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">Basic React (self-learning)</span>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-6">
+        <h4 class="text-orange-300 font-semibold flex items-center gap-2"><i class="fas fa-tools skill-icon"></i> Software & Tools</h4>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">Windows</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">Linux (Ubuntu/Debian)</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">Microsoft 365</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">NetBeans</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">IntelliJ IDEA</span>
+          <span class="bg-[#1e3a5f] px-4 py-1.5 rounded-full text-sm">VS Code</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS (featured) -->
+  <section id="projects" class="py-16 reveal">
+    <h2 class="text-3xl font-bold inline-block border-b-4 border-orange-400 pb-1 mb-8">Featured Project</h2>
+    <div class="glass-card rounded-2xl overflow-hidden max-w-3xl">
+      <div class="project-img-placeholder">
+        <i class="fas fa-globe-africa"></i> <span class="ml-3 text-base font-light">IkusasaLentsha NPO</span>
+      </div>
+      <div class="p-6">
+        <h3 class="text-2xl font-semibold text-white">IkusasaLentsha NPO Website</h3>
+        <p class="text-gray-300 mt-2 text-sm">Developed and managed the official website for IkusasaLentsha NPO.</p>
+        <div class="flex flex-wrap gap-2 mt-3">
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">Responsive Design</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">HTML</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">CSS</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">JavaScript</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">Student Support</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">Events</span>
+          <span class="bg-[#1e3a5f] px-3 py-1 rounded-full text-xs">Digital Presence</span>
+        </div>
+        <div class="flex flex-wrap gap-4 mt-5">
+          <a href="https://ikusasalentsha.org" target="_blank" rel="noopener" class="px-5 py-2 bg-orange-500 hover:bg-orange-400 text-[#0b1a2f] font-semibold rounded-full transition text-sm flex items-center gap-2">
+            <i class="fas fa-eye"></i> View Website
+          </a>
+          <a href="#" class="px-5 py-2 border border-orange-400/60 text-orange-300 hover:bg-orange-500/10 rounded-full transition text-sm flex items-center gap-2">
+            <i class="fas fa-code"></i> View Code
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADDITIONAL INFO + SOFT SKILLS -->
+  <section id="additional" class="py-16 reveal">
+    <div class="grid md:grid-cols-2 gap-8">
+      <div>
+        <h2 class="text-2xl font-bold border-b-4 border-orange-400 pb-1 mb-5 inline-block">Additional Information</h2>
+        <div class="glass-card rounded-2xl p-6 space-y-4">
+          <p class="text-gray-300 text-sm flex gap-3"><i class="fas fa-check-circle text-orange-400 mt-1"></i> Built and contributed to academic and real-world systems using web technologies and databases.</p>
+          <p class="text-gray-300 text-sm flex gap-3"><i class="fas fa-check-circle text-orange-400 mt-1"></i> Currently learning React.js and expanding skills in modern web and mobile application development.</p>
+          <p class="text-gray-300 text-sm flex gap-3"><i class="fas fa-check-circle text-orange-400 mt-1"></i> Interested in software development, database systems, and IT support environments.</p>
+        </div>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold border-b-4 border-orange-400 pb-1 mb-5 inline-block">Soft Skills</h2>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="glass-card rounded-xl p-4 text-center"><i class="fas fa-brain text-orange-400 text-2xl"></i><p class="text-xs mt-1">Problem-solving and analytical thinking</p></div>
+          <div class="glass-card rounded-xl p-4 text-center"><i class="fas fa-users text-orange-400 text-2xl"></i><p class="text-xs mt-1">Communication and teamwork</p></div>
+          <div class="glass-card rounded-xl p-4 text-center"><i class="fas fa-clock text-orange-400 text-2xl"></i><p class="text-xs mt-1">Time management and ability to meet deadlines</p></div>
+          <div class="glass-card rounded-xl p-4 text-center"><i class="fas fa-sync-alt text-orange-400 text-2xl"></i><p class="text-xs mt-1">Adaptability and willingness to learn</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+<section id="contact" class="py-16 reveal">
+  <h2 class="text-3xl font-bold inline-block border-b-4 border-orange-400 pb-1 mb-8">Contact</h2>
+  <div class="grid md:grid-cols-5 gap-8">
+    <div class="md:col-span-3 glass-card rounded-2xl p-6">
+      <form action="https://formspree.io/f/mrewqqbk" method="POST" class="space-y-4">
+        <div>
+          <input type="text" name="name" placeholder="Name" required 
+                 class="w-full bg-[#0a192f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:border-orange-400 outline-none" />
+        </div>
+        <div>
+          <input type="email" name="email" placeholder="Email" required 
+                 class="w-full bg-[#0a192f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:border-orange-400 outline-none" />
+        </div>
+        <div>
+          <input type="text" name="subject" placeholder="Subject" required 
+                 class="w-full bg-[#0a192f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:border-orange-400 outline-none" />
+        </div>
+        <div>
+          <textarea rows="4" name="message" placeholder="Message" required 
+                    class="w-full bg-[#0a192f] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:border-orange-400 outline-none"></textarea>
+        </div>
+        <button type="submit" class="bg-orange-500 hover:bg-orange-400 text-[#0b1a2f] font-semibold px-6 py-3 rounded-full transition shadow shadow-orange-500/30 text-sm w-full sm:w-auto">
+          <i class="fas fa-paper-plane mr-2"></i>Send Message
+        </button>
+      </form>
+    </div>
+    <div class="md:col-span-2 space-y-4">
+      <div class="glass-card rounded-2xl p-5 flex items-center gap-4">
+        <i class="fas fa-phone-alt text-orange-400 text-xl"></i>
+        <div>
+          <p class="text-xs text-gray-400">Phone</p>
+          <p class="text-sm">078 008 2317</p>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-5 flex items-center gap-4">
+        <i class="fas fa-envelope text-orange-400 text-xl"></i>
+        <div>
+          <p class="text-xs text-gray-400">Email</p>
+          <p class="text-sm break-all">lelanigumbi2004@gmail.com</p>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-5 flex items-center gap-4">
+        <i class="fas fa-map-pin text-orange-400 text-xl"></i>
+        <div>
+          <p class="text-xs text-gray-400">Location</p>
+          <p class="text-sm">Bergville, KwaZulu-Natal</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 mt-12 py-6 text-center text-gray-400 text-sm">
+  <p>Copyright © 2026 · Designed and Developed by <span class="text-orange-300 font-medium">Phikelelani Gideon Gumbi</span></p>
+</footer>
+
+<!-- JS: typing, scroll reveal, mobile menu, back to top, loader -->
+<script>
+  (function() {
+    // loader
+    window.addEventListener('load', function() {
+      document.getElementById('loader').classList.add('hidden');
+    });
+
+    // typed effect
+    const roles = ['Computer Science Student', 'Software Developer', 'Web Developer'];
+    let roleIndex = 0, charIndex = 0, isDeleting = false;
+    const typedSpan = document.getElementById('typedText');
+
+    function typeLoop() {
+      const current = roles[roleIndex];
+      if (isDeleting) {
+        typedSpan.textContent = current.substring(0, charIndex--);
+        if (charIndex < 0) {
+          isDeleting = false;
+          roleIndex = (roleIndex + 1) % roles.length;
+          setTimeout(typeLoop, 400);
+          return;
+        }
+        setTimeout(typeLoop, 60);
+      } else {
+        typedSpan.textContent = current.substring(0, charIndex++);
+        if (charIndex > current.length) {
+          isDeleting = true;
+          setTimeout(typeLoop, 1800);
+          return;
+        }
+        setTimeout(typeLoop, 100);
+      }
+    }
+    typeLoop();
+
+    // mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', function() {
+      mobileMenu.classList.toggle('open');
+      const icon = this.querySelector('i');
+      icon.classList.toggle('fa-bars');
+      icon.classList.toggle('fa-times');
+    });
+
+    // scroll reveal
+    const revealElements = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -30px 0px' });
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // back to top
+    const backBtn = document.getElementById('backTop');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 400) backBtn.classList.add('visible');
+      else backBtn.classList.remove('visible');
+    });
+    backBtn.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // close mobile menu on link click
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+      link.addEventListener('click', function() {
+        mobileMenu.classList.remove('open');
+        const icon = hamburger.querySelector('i');
+        icon.classList.add('fa-bars');
+        icon.classList.remove('fa-times');
+      });
+    });
+
+    // smooth anchor offset (fixed header)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          const offset = 80;
+          const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      });
+    });
+  })();
+</script>
+</body>
+</html>
