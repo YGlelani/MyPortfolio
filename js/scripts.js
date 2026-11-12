@@ -1,4 +1,3 @@
-
 /* ==========================================================================
    Phikelelani Gumbi — Portfolio
    Vanilla JavaScript. No dependencies, no backend.
